@@ -1,0 +1,32 @@
+{
+  "name": "decentralized-health-record-management",
+  "version": "1.0.0",
+  "description": "This is a helth record management dapp",
+  "homepage": "https://github.com/DevJayantaGhosh/Decentralized-Health-Record-Management#readme",
+  "bugs": {
+    "url": "https://github.com/DevJayantaGhosh/Decentralized-Health-Record-Management/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DevJayantaGhosh/Decentralized-Health-Record-Management.git"
+  },
+  "license": "ISC",
+  "author": "Jayanta Ghosh",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@hashgraph/hedera-local": "^2.4.5",
+    "@nomicfoundation/hardhat-toolbox": "^2.0.1",
+    "dotenv": "^16.0.3"
+  },
+  "devDependencies": {
+    "hardhat": "^2.12.6"
+  },
+
+  "directories": {
+    "test": "test"
+  }
+}
