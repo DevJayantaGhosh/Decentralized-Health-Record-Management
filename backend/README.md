@@ -30,11 +30,10 @@ PREVIEWNET_ENDPOINT='PREVIEWNET_ENDPOINT_URL'
 # For Hedera Mainnet
 MAINNET_OPERATOR_PRIVATE_KEY="MAINNET_OPERATOR_PRIVATE_KEY"
 MAINNET_ENDPOINT='MAINNET_ENDPOINT_URL'
+---
 
 
-
-
-## Try running some of the following tasks:
+## Run the following command to build and test the smart contract.
 
 ```shell
 npx hardhat help
@@ -52,7 +51,7 @@ npx hardhat deploy-contract
 npx hardhat deploy-contract --network testnet
 ```
 
----
+
 
 
 
