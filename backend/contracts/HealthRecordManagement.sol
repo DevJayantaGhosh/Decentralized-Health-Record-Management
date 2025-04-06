@@ -75,6 +75,20 @@ contract HealthRecordManagement{
         console.log("Decentralized Health Record Management contract deployed by:", msg.sender);
     }
 
+    // Check if the given address is the contract owner
+    function isOwner(address user) public view returns (bool) {
+        return user == owner;
+    }
+
+    // Check if the address is an authorized health service provider
+    function isHealthServiceProvider(address user) public view returns (bool) {
+        return authorizedHealthServiceProviders[user];
+    }
+
+    // A normal user is neither owner nor health service provider
+    function isNormalUser(address user) public view returns (bool) {
+        return user != owner && !authorizedHealthServiceProviders[user];
+    }
 
     // Register an authorized healthcare service provider
     function registerHealthCareServiceProvider(address _healthServiceProvider) public onlyOwner {
