@@ -1,8 +1,26 @@
-Create .env file  and set private key
+# Solidity Backend with Hardhat
+
+Solidity-based backend setup using Hardhat for smart contract development. It supports compilation, testing, and deployment of smart contracts to Hedera's Testnet, Previewnet, and Mainnet.
+
+---
+
+## Prerequisites
+
+Before you begin, ensure you have the following installed:
+- [Node.js](https://nodejs.org/en/)
+- [npm](https://www.npmjs.com/) or [yarn](https://yarnpkg.com/)
+- [Hardhat](https://hardhat.org/)
+
+---
+
+## Environment Configuration
+
+1. Create a `.env` file in the root directory of your backend project folder.
+2. Add the following configurations for Hedera networks:
+
+```dotenv
 # For Hedera Testnet
-# Testnet account ECDSA hex-encoded private key
 TESTNET_OPERATOR_PRIVATE_KEY=
-# Testnet JSON-RPC Relay endpoint URL (ex: 'https://testnet.hashio.io/api')
 TESTNET_ENDPOINT='https://testnet.hashio.io/api'
 
 # For Hedera Previewnet
@@ -14,7 +32,9 @@ MAINNET_OPERATOR_PRIVATE_KEY="MAINNET_OPERATOR_PRIVATE_KEY"
 MAINNET_ENDPOINT='MAINNET_ENDPOINT_URL'
 
 
-Try running some of the following tasks:
+
+---
+## Try running some of the following tasks:
 
 ```shell
 npx hardhat help
@@ -30,3 +50,8 @@ npx hardhat deploy-contract
 # deploys to testnet
 npx hardhat deploy-contract --network testnet
 ```
+
+---
+
+
+
