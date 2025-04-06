@@ -8,11 +8,11 @@ contract HealthRecordManagement{
     address private owner;
 
     struct HealthRecord{
-        uint recordId;
+        uint256 recordId;
         address patientAddress;
         string diagonosis;
         string treatment;
-        uint timeStamp;
+        uint256 timeStamp;
         address addedBy;
     }
 
@@ -25,10 +25,10 @@ contract HealthRecordManagement{
 
 
     //events
-    event RegisterAuthorizedHealthServiceProvider(address healthServiceProviderAddress,bool registerStatus,address updateBy,uint timeStamp);
-    event DeRegisterAuthorizedHealthServiceProvider(address healthServiceProviderAddress,bool deRegisterStatus,address updateBy,uint timeStamp);
-    event TransferFeesAndBookAppointment(address fromPatientAddress, address toHealthServiceProviderAddress, uint fees, uint timeStamp);
-    event AddHealthRecord(uint recordId,address patientAddress, address addedBy ,uint timeStamp);
+    event RegisterAuthorizedHealthServiceProvider(address indexed healthServiceProviderAddress,bool registerStatus,address indexed updateBy,uint256 timeStamp);
+    event DeRegisterAuthorizedHealthServiceProvider(address indexed healthServiceProviderAddress,bool deRegisterStatus,address indexed updateBy,uint256 timeStamp);
+    event TransferFeesAndBookAppointment(address indexed fromPatientAddress, address indexed toHealthServiceProviderAddress, uint256 fees, uint256 timeStamp);
+    event AddHealthRecord(uint256 recordId,address indexed patientAddress, address indexed addedBy ,uint256 timeStamp);
 
     //Modifiers
     modifier onlyOwner() {
