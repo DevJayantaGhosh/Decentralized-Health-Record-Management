@@ -1,5 +1,4 @@
 // SPDX-License-Identifier: UNLICENSED
-
 pragma solidity >=0.7.0 <0.9.0;
 
 import "hardhat/console.sol";
@@ -10,52 +9,82 @@ contract HealthRecordManagement {
     struct HealthRecord {
         uint256 recordId;
         address patientAddress;
+        int16 height;
+        int16 weight;
+        string bloodPressure;
+        string cholesterol;
         string diagnosis;
         string treatment;
         uint256 timeStamp;
         address addedBy;
     }
 
-    struct Prescription {
-        uint256 prescriptionId;
-        address patientAddress;
-        string medication;
-        string dosage;
+    struct Doctor {
+        address doctorAddress;
+        string qualification;
+        string specialization;
+        int256 fees;
+        bool status; // true = authorized
         uint256 timeStamp;
-        address issuedBy;
+        address addedBy;
     }
 
-    struct EmergencyContact {
-        string name;
-        string phone;
-        string relationship;
-    }
+    Doctor[] private doctors;
 
-    // Mappings
-    mapping(address => bool) private authorizedHealthServiceProviders; // Tracks authorized healthcare provider Address - bool
-    mapping(address => address[]) private patientToDoctors; // Maps a patient to a list of doctors
-    mapping(address => address[]) private doctorToPatients; // Maps a doctor to a list of patients
-    mapping(address => HealthRecord[]) private patientHealthRecords; // patientAddress - array of healthRecords
-    mapping(address => Prescription[]) private patientPrescriptions; // patientAddress - array of prescriptions
-    mapping(address => EmergencyContact) private patientEmergencyContacts; // patientAddress - emergency contact
+    mapping(address => bool) private doctorAuthorizationStatus;
+    mapping(address => address[]) private patientToDoctors;
+    mapping(address => address[]) private doctorToPatients;
+    mapping(address => HealthRecord[]) private patientHealthRecords;
 
-    // Events
-    event RegisterAuthorizedHealthServiceProvider(address indexed healthServiceProviderAddress, bool registerStatus, address indexed updateBy, uint256 timeStamp);
-    event DeRegisterAuthorizedHealthServiceProvider(address indexed healthServiceProviderAddress, bool deRegisterStatus, address indexed updateBy, uint256 timeStamp);
-    event TransferFeesAndBookAppointment(address indexed fromPatientAddress, address indexed toHealthServiceProviderAddress, uint256 fees, uint256 timeStamp);
-    event AddHealthRecord(uint256 recordId, address indexed patientAddress, address indexed addedBy, uint256 timeStamp);
-    event IssuePrescription(uint256 prescriptionId, address indexed patientAddress, address indexed issuedBy, uint256 timeStamp);
-    event UpdateEmergencyContact(address indexed patientAddress, string name, string phone, string relationship, uint256 timeStamp);
+    event RegisterAuthorizedDoctor(
+        address indexed doctorAddress,
+        string qualification,
+        string specialization,
+        int256 fees,
+        bool status,
+        uint256 timeStamp,
+        address indexed registeredBy
+    );
 
-    // Modifiers
+    event DeRegisterAuthorizedDoctor(
+        address indexed doctorAddress,
+        bool deregisterStatus,
+        string reason,
+        uint256 timeStamp,
+        address indexed deRegisteredBy
+    );
+
+    event TransferFeesAndBookAppointment(
+        address indexed fromPatientAddress,
+        address indexed toHealthServiceProviderAddress,
+        uint256 fees,
+        string reason,
+        uint256 timeStamp
+    );
+
+    event AddHealthRecord(
+        uint256 recordId,
+        address indexed patientAddress,
+        int16 height,
+        int16 weight,
+        string bloodPressure,
+        string cholesterol,
+        string diagnosis,
+        string treatment,
+        uint256 timeStamp,
+        address indexed addedBy
+    );
+
     modifier onlyOwner() {
         require(msg.sender == owner, "Only contract owner can perform this action");
         _;
     }
+
     modifier onlyAuthorizedHealthServiceProvider() {
-        require(authorizedHealthServiceProviders[msg.sender], "Only authorized health service provider can perform this action");
+        require(doctorAuthorizationStatus[msg.sender] == true, "Only authorized health service provider can perform this action");
         _;
     }
+
     modifier canAddHealthRecord(address patientAddress) {
         require(
             msg.sender == patientAddress || isDoctorOfPatient(msg.sender, patientAddress),
@@ -63,6 +92,7 @@ contract HealthRecordManagement {
         );
         _;
     }
+
     modifier canViewHealthRecord(address patientAddress) {
         require(
             msg.sender == patientAddress || isDoctorOfPatient(msg.sender, patientAddress),
@@ -71,162 +101,168 @@ contract HealthRecordManagement {
         _;
     }
 
-    // Helper function to check if a doctor is associated with a patient
-    function isDoctorOfPatient(address doctorAddress, address patientAddress) internal view returns (bool) {
-        address[] memory doctors = patientToDoctors[patientAddress];
+    constructor() {
+        owner = msg.sender;
+        console.log("Decentralized Health Record Management contract deployed by:", msg.sender);
+    }
+
+    function registerDoctor(
+        address _doctorAddress,
+        string memory _qualification,
+        string memory _specialization,
+        int256 _fees
+    ) public onlyOwner {
+        require(!doctorAuthorizationStatus[_doctorAddress], "Doctor already authorized");
+
+        Doctor memory newDoctor = Doctor({
+            doctorAddress: _doctorAddress,
+            qualification: _qualification,
+            specialization: _specialization,
+            fees: _fees,
+            status: true,
+            timeStamp: block.timestamp,
+            addedBy: msg.sender
+        });
+
+        doctors.push(newDoctor);
+        doctorAuthorizationStatus[_doctorAddress] = true;
+
+        emit RegisterAuthorizedDoctor(
+            _doctorAddress,
+            _qualification,
+            _specialization,
+            _fees,
+            true,
+            block.timestamp,
+            msg.sender
+        );
+    }
+
+    function deregisterDoctor(address _doctorAddress, string memory _reason) public onlyOwner {
+        require(doctorAuthorizationStatus[_doctorAddress], "Doctor is not authorized");
+
+        doctorAuthorizationStatus[_doctorAddress] = false;
+
+        emit DeRegisterAuthorizedDoctor(
+            _doctorAddress,
+            false,
+            _reason,
+            block.timestamp,
+            msg.sender
+        );
+    }
+
+    function assignDoctorToPatient(address _doctorAddress) public {
+        require(doctorAuthorizationStatus[_doctorAddress], "Doctor is not authorized");
+
+        address _patientAddress = msg.sender;
+
+        patientToDoctors[_patientAddress].push(_doctorAddress);
+        doctorToPatients[_doctorAddress].push(_patientAddress);
+    }
+
+    function bookAppointment(address payable _doctorAddress, string memory _reason) public payable {
+        require(msg.sender != _doctorAddress, "Self-booking not allowed");
+
+        Doctor memory doc;
+        bool found = false;
+
         for (uint256 i = 0; i < doctors.length; i++) {
-            if (doctors[i] == doctorAddress) {
+            if (doctors[i].doctorAddress == _doctorAddress) {
+                doc = doctors[i];
+                found = true;
+                break;
+            }
+        }
+
+        require(found, "Doctor not found");
+        require(doctorAuthorizationStatus[_doctorAddress], "Doctor is not authorized");
+        require(msg.value >= uint256(doc.fees), "Insufficient fees for appointment");
+
+        // Transfer fees
+        _doctorAddress.transfer(msg.value);
+
+        // Add mapping
+        patientToDoctors[msg.sender].push(_doctorAddress);
+        doctorToPatients[_doctorAddress].push(msg.sender);
+
+        emit TransferFeesAndBookAppointment(
+            msg.sender,
+            _doctorAddress,
+            msg.value,
+            _reason,
+            block.timestamp
+        );
+    }
+
+
+    function addHealthRecord(
+        address _patientAddress,
+        int16 _height,
+        int16 _weight,
+        string memory _bloodPressure,
+        string memory _cholesterol,
+        string memory _diagnosis,
+        string memory _treatment
+    ) public canAddHealthRecord(_patientAddress) {
+        uint256 newRecordId = patientHealthRecords[_patientAddress].length + 1;
+
+        HealthRecord memory newRecord = HealthRecord({
+            recordId: newRecordId,
+            patientAddress: _patientAddress,
+            height: _height,
+            weight: _weight,
+            bloodPressure: _bloodPressure,
+            cholesterol: _cholesterol,
+            diagnosis: _diagnosis,
+            treatment: _treatment,
+            timeStamp: block.timestamp,
+            addedBy: msg.sender
+        });
+
+        patientHealthRecords[_patientAddress].push(newRecord);
+
+        emit AddHealthRecord(
+            newRecordId,
+            _patientAddress,
+            _height,
+            _weight,
+            _bloodPressure,
+            _cholesterol,
+            _diagnosis,
+            _treatment,
+            block.timestamp,
+            msg.sender
+        );
+    }
+
+    function viewHealthRecords(address _patientAddress) public view canViewHealthRecord(_patientAddress) returns (HealthRecord[] memory) {
+        return patientHealthRecords[_patientAddress];
+    }
+
+    function isDoctorOfPatient(address _doctor, address _patient) internal view returns (bool) {
+        address[] memory doctorsOfPatient = patientToDoctors[_patient];
+        for (uint256 i = 0; i < doctorsOfPatient.length; i++) {
+            if (doctorsOfPatient[i] == _doctor) {
                 return true;
             }
         }
         return false;
     }
 
-    constructor() {
-        owner = msg.sender; // 'msg.sender' is sender of current call, contract deployer for a constructor
-        console.log("Decentralized Health Record Management contract deployed by:", msg.sender);
+    function getAllDoctors() public view returns (Doctor[] memory) {
+        return doctors;
     }
 
-    // Check if the given address is the contract owner
-    function isOwner(address user) public view returns (bool) {
-        return user == owner;
+    function getAssignedDoctors(address _patientAddress) public view returns (address[] memory) {
+        return patientToDoctors[_patientAddress];
     }
 
-    // Check if the address is an authorized health service provider
-    function isHealthServiceProvider(address user) public view returns (bool) {
-        return authorizedHealthServiceProviders[user];
+    function getPatientsOfDoctor(address _doctorAddress) public view returns (address[] memory) {
+        return doctorToPatients[_doctorAddress];
     }
 
-    // A normal user is neither owner nor health service provider
-    function isNormalUser(address user) public view returns (bool) {
-        return user != owner && !authorizedHealthServiceProviders[user];
-    }
-
-    // Register an authorized healthcare service provider
-    function registerHealthCareServiceProvider(address _healthServiceProvider) public onlyOwner {
-        require(_healthServiceProvider != address(0), "Invalid address: address cannot be null");
-        require(!authorizedHealthServiceProviders[_healthServiceProvider], "Health Service Provider is already registered");
-
-        authorizedHealthServiceProviders[_healthServiceProvider] = true;
-        console.log("%s registered successfully as an authorized HealthCare Service Provider", _healthServiceProvider);
-        emit RegisterAuthorizedHealthServiceProvider(_healthServiceProvider, true, owner, block.timestamp);
-    }
-
-    // Deregister a healthcare service provider
-    function deregisterHealthCareServiceProvider(address _healthServiceProvider) public onlyOwner {
-        require(_healthServiceProvider != address(0), "Invalid address: address cannot be null");
-        require(authorizedHealthServiceProviders[_healthServiceProvider], "Health Service Provider is not currently registered");
-
-        authorizedHealthServiceProviders[_healthServiceProvider] = false;
-        console.log("%s deregistered successfully", _healthServiceProvider);
-        emit DeRegisterAuthorizedHealthServiceProvider(_healthServiceProvider, false, owner, block.timestamp);
-    }
-
-    // Patient sets an appointment with a doctor by fees
-    function setAppointment(address doctorAddress) public payable {
-        require(doctorAddress != address(0), "Invalid doctor address");
-        require(authorizedHealthServiceProviders[doctorAddress], "Doctor is not an authorized healthcare provider");
-        require(msg.value > 0, "Appointment fee must be greater than zero");
-
-        // Transfer fee directly to the doctor
-        payable(doctorAddress).transfer(msg.value);
-
-        // Update relationships
-        patientToDoctors[msg.sender].push(doctorAddress);
-        doctorToPatients[doctorAddress].push(msg.sender);
-
-        emit TransferFeesAndBookAppointment(msg.sender, doctorAddress, msg.value, block.timestamp);
-    }
-
-    // Get a patient's doctors
-    function getDoctorListByPatientAddress(address patientAddress) public view returns (address[] memory) {
-        require(msg.sender == patientAddress, "Only the patient can view their doctors");
-        return patientToDoctors[patientAddress];
-    }
-
-    // Get a doctor's patients
-    function getPatientListByDoctorAddress(address doctorAddress) public view returns (address[] memory) {
-        require(authorizedHealthServiceProviders[doctorAddress], "Only authorized healthcare service providers can have patients");
-        return doctorToPatients[doctorAddress];
-    }
-
-    // Add health record
-    function addHealthRecord(
-        address patientAddress,
-        string memory diagnosis,
-        string memory treatment
-    ) public canAddHealthRecord(patientAddress) {
-        console.log("Adding Health Record for Patient Address: %s", patientAddress);
-        uint256 recordId = patientHealthRecords[patientAddress].length + 1;
-
-        // Create and push the new record
-        patientHealthRecords[patientAddress].push(
-            HealthRecord(
-                recordId,
-                patientAddress,
-                diagnosis,
-                treatment,
-                block.timestamp,
-                msg.sender // AddedBy: current caller (appointed-doctor or patient)
-            )
-        );
-
-        console.log("Health Record added successfully for Patient: %s by: %s", patientAddress, msg.sender);
-        emit AddHealthRecord(recordId, patientAddress, msg.sender, block.timestamp);
-    }
-
-    // View health records
-    function viewHealthRecords(address patientAddress) public view canViewHealthRecord(patientAddress) returns (HealthRecord[] memory) {
-        return patientHealthRecords[patientAddress];
-    }
-
-    // Issue prescription
-    function issuePrescription(
-        address patientAddress,
-        string memory medication,
-        string memory dosage
-    ) public onlyAuthorizedHealthServiceProvider {
-        console.log("Issuing Prescription for Patient Address: %s", patientAddress);
-        uint256 prescriptionId = patientPrescriptions[patientAddress].length + 1;
-
-        // Create and push the new prescription
-        patientPrescriptions[patientAddress].push(
-            Prescription(
-                prescriptionId,
-                patientAddress,
-                medication,
-                dosage,
-                block.timestamp,
-                msg.sender // IssuedBy: current caller (doctor)
-            )
-        );
-
-        console.log("Prescription issued successfully for Patient: %s by: %s", patientAddress, msg.sender);
-        emit IssuePrescription(prescriptionId, patientAddress, msg.sender, block.timestamp);
-    }
-
-    // View prescriptions
-    function viewPrescriptions(address patientAddress) public view canViewHealthRecord(patientAddress) returns (Prescription[] memory) {
-        return patientPrescriptions[patientAddress];
-    }
-
-    // Update emergency contact
-    function updateEmergencyContact(
-        string memory name,
-        string memory phone,
-        string memory relationship
-    ) public {
-        console.log("Updating Emergency Contact for Patient Address: %s", msg.sender);
-
-        // Update emergency contact
-        patientEmergencyContacts[msg.sender] = EmergencyContact(name, phone, relationship);
-
-        console.log("Emergency Contact updated successfully for Patient: %s", msg.sender);
-        emit UpdateEmergencyContact(msg.sender, name, phone, relationship, block.timestamp);
-    }
-
-    // View emergency contact
-    function viewEmergencyContact(address patientAddress) public view canViewHealthRecord(patientAddress) returns (EmergencyContact memory) {
-        return patientEmergencyContacts[patientAddress];
+    function getOwner() public view returns (address) {
+        return owner;
     }
 }
