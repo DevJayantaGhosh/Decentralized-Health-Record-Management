@@ -59,7 +59,7 @@ const App = () => {
       if (isOwner) {
         userRole = "OWNER";
       } else if (await contractInstance.isAuthorizedDoctor(userAddress)) {
-        userRole = "HEALTH_SERVICE_PROVIDER";
+        userRole = "DOCTOR";
       }
 
       setState({ provider, signer, contract: contractInstance });
