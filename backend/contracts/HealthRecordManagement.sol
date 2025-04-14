@@ -106,6 +106,21 @@ contract HealthRecordManagement {
         console.log("Decentralized Health Record Management contract deployed by:", msg.sender);
     }
 
+
+    // Functons to identify roles
+    function isOwner(address user) public view returns (bool) {
+        return user == owner;
+    }
+    function isAuthorizedDoctor(address user) public view returns (bool) {
+        return doctorAuthorizationStatus[user];
+    }
+
+   function isNormalUser(address user) public view returns (bool) {
+        return user != owner && !doctorAuthorizationStatus[user];
+    }
+
+
+
     function registerDoctor(
         address _doctorAddress,
         string memory _qualification,
@@ -179,10 +194,16 @@ contract HealthRecordManagement {
         require(doctorAuthorizationStatus[_doctorAddress], "Doctor is not authorized");
         require(msg.value >= uint256(doc.fees), "Insufficient fees for appointment");
 
+        // Check for existing booking
+        address[] memory bookedDoctors = patientToDoctors[msg.sender];
+        for (uint256 i = 0; i < bookedDoctors.length; i++) {
+            require(bookedDoctors[i] != _doctorAddress, "Appointment with this doctor already booked");
+        }
+
         // Transfer fees
         _doctorAddress.transfer(msg.value);
 
-        // Add mapping
+        // Add mappings
         patientToDoctors[msg.sender].push(_doctorAddress);
         doctorToPatients[_doctorAddress].push(msg.sender);
 
@@ -194,6 +215,7 @@ contract HealthRecordManagement {
             block.timestamp
         );
     }
+
 
 
     function addHealthRecord(
@@ -240,6 +262,20 @@ contract HealthRecordManagement {
         return patientHealthRecords[_patientAddress];
     }
 
+    function getAllDoctors() public view returns (Doctor[] memory) {
+        return doctors;
+    }
+
+
+    function getAssignedDoctors(address _patientAddress) public view returns (address[] memory) {
+        return patientToDoctors[_patientAddress];
+    }
+
+    function getPatientsOfDoctor(address _doctorAddress) public view returns (address[] memory) {
+        return doctorToPatients[_doctorAddress];
+    }
+    
+   // Utility Functon
     function isDoctorOfPatient(address _doctor, address _patient) internal view returns (bool) {
         address[] memory doctorsOfPatient = patientToDoctors[_patient];
         for (uint256 i = 0; i < doctorsOfPatient.length; i++) {
@@ -250,19 +286,4 @@ contract HealthRecordManagement {
         return false;
     }
 
-    function getAllDoctors() public view returns (Doctor[] memory) {
-        return doctors;
-    }
-
-    function getAssignedDoctors(address _patientAddress) public view returns (address[] memory) {
-        return patientToDoctors[_patientAddress];
-    }
-
-    function getPatientsOfDoctor(address _doctorAddress) public view returns (address[] memory) {
-        return doctorToPatients[_doctorAddress];
-    }
-
-    function getOwner() public view returns (address) {
-        return owner;
-    }
 }
