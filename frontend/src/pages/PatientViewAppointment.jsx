@@ -2,7 +2,8 @@ import React, { useEffect, useState } from "react";
 import {
   Container,
   Typography,
-  Paper,
+  Card,
+  CardContent,
   Box,
   Button,
   CircularProgress,
@@ -15,22 +16,11 @@ const PatientViewAppointment = ({ contract, account }) => {
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(false);
   const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
-
+  const delay = (ms) => new Promise((res) => setTimeout(res, ms));
   const fetchAppointments = async () => {
     try {
       setLoading(true);
-      const doctorAddresses = await contract.getDoctorsForPatient(account);
-      const appointmentDetails = await Promise.all(
-        doctorAddresses.map(async (doctorAddress) => {
-          const doctor = await contract.getDoctor(doctorAddress);
-          return {
-            address: doctorAddress,
-            qualification: doctor.qualification,
-            specialization: doctor.specialization,
-            fees: doctor.fees.toString(),
-          };
-        })
-      );
+      const appointmentDetails = await contract.getAssignedDoctorsOfPatient(account);
       setAppointments(appointmentDetails);
     } catch (err) {
       console.error("Error fetching appointments", err);
@@ -43,9 +33,31 @@ const PatientViewAppointment = ({ contract, account }) => {
   const markAppointmentDone = async (doctorAddress) => {
     try {
       setLoading(true);
-      const tx = await contract.markAppointmentDoneByPatient(doctorAddress);
-      await tx.wait();
-      setSnackbar({ open: true, message: "Appointment marked as done!", severity: "success" });
+      const tx = await contract.markAppointmentDoneAndRevokeAccess(doctorAddress);
+      const txReceipt = await tx.wait();
+      const txHash = txReceipt.transactionHash;
+
+      await delay(3000);
+      const hashscanLink = `https://hashscan.io/testnet/transaction/${txHash}`;
+
+      setSnackbar({
+        open: true,
+        severity: "success",
+        message: (
+          <>
+            Appointment marked as done & revoked access! {" "}
+            <a
+              href={hashscanLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ color: "#fff", textDecoration: "underline" }}
+            >
+              View Transaction
+            </a>
+          </>
+        ),
+      });
+
       await fetchAppointments();
     } catch (err) {
       console.error(err);
@@ -64,7 +76,7 @@ const PatientViewAppointment = ({ contract, account }) => {
   };
 
   return (
-    <Container maxWidth="md" sx={{ mt: 5 }}>
+    <Container maxWidth="lg" sx={{ mt: 5 }}>
       <Typography variant="h4" align="center" gutterBottom>
         Your Booked Appointments
       </Typography>
@@ -78,33 +90,33 @@ const PatientViewAppointment = ({ contract, account }) => {
           No appointments found.
         </Typography>
       ) : (
-        <Grid container spacing={3} mt={2}>
-          {appointments.map((doctor, index) => (
-            <Grid item xs={12} md={6} key={index}>
-              <Paper elevation={3} sx={{ p: 3 }}>
-                <Typography variant="h6" gutterBottom>
-                  Doctor Address:
-                </Typography>
-                <Typography variant="body2" sx={{ wordBreak: "break-word" }}>
-                  {doctor.address}
-                </Typography>
+        <Grid container spacing={3} mt={3} justifyContent="center">
+                  {appointments.map((doctorAddress, index) => (
+                    <Grid item xs={12} sm={6} md={6} key={index}>
+                      <Card>
+                        <CardContent>
+                          <Grid container justifyContent="space-between" alignItems="center">
+                            <Typography variant="h6">Doctor</Typography>
+                          </Grid>
 
-                <Typography mt={1}>Qualification: {doctor.qualification}</Typography>
-                <Typography>Specialization: {doctor.specialization}</Typography>
-                <Typography>Fees: {doctor.fees} Wei</Typography>
+                          <Typography variant="body2" sx={{ mt: 1 }}>
+                            <strong>Address:</strong> {doctorAddress}
+                          </Typography>
+                        
+                          <Button
+                          variant="contained"
+                          color="success"
+                          onClick={() => markAppointmentDone(doctorAddress)}
+                          sx={{ mt: 2 }}
+                          disabled={loading}
+                        >
+                          {loading ? <CircularProgress size={20} /> : "Revoke Access"}
+                        </Button>
 
-                <Button
-                  variant="contained"
-                  color="success"
-                  onClick={() => markAppointmentDone(doctor.address)}
-                  sx={{ mt: 2 }}
-                  disabled={loading}
-                >
-                  {loading ? <CircularProgress size={20} /> : "Mark as Done"}
-                </Button>
-              </Paper>
-            </Grid>
-          ))}
+                        </CardContent>
+                      </Card>
+                    </Grid>
+                  ))}
         </Grid>
       )}
 

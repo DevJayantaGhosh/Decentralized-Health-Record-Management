@@ -21,8 +21,7 @@ const RegisterDoctor = ({ contract, account, role }) => {
   const [formData, setFormData] = useState({
     doctorAddress: "",
     qualification: "",
-    specialization: "",
-    fees: 0,
+    specialization: ""
   });
 
 
@@ -46,15 +45,13 @@ const RegisterDoctor = ({ contract, account, role }) => {
     const {
       doctorAddress,
       qualification,
-      specialization,
-      fees
+      specialization
     } = formData;
 
     if (
       !doctorAddress ||
       !qualification ||
-      !specialization ||
-      !fees
+      !specialization
     ) {
 
 
@@ -70,8 +67,7 @@ const RegisterDoctor = ({ contract, account, role }) => {
       const tx = await contract.registerDoctor(
         doctorAddress,
         qualification,
-        specialization,
-        parseInt(fees)
+        specialization
       );
       const txReceipt = await tx.wait();
       const txHash = txReceipt.transactionHash;
@@ -89,8 +85,7 @@ const RegisterDoctor = ({ contract, account, role }) => {
       setFormData({
         doctorAddress: "",
         qualification: "",
-        specialization: "",
-        fees: 0,
+        specialization: ""
       });
     } catch (error) {
       console.error(error);
@@ -168,19 +163,6 @@ const RegisterDoctor = ({ contract, account, role }) => {
             fullWidth
             margin="normal"
           />
-
-        <TextField
-          label="Fees"
-          name="fees"
-          type="number"
-          value={formData.fees}
-          onChange={handleChange}
-          fullWidth
-          margin="normal"
-        />
-
-
-  
 
           <Button
             variant="contained"

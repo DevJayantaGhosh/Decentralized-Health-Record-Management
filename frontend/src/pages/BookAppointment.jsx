@@ -71,10 +71,7 @@ const BookAppointment = ({ contract, account }) => {
 
       const tx = await contract.bookAppointment(
         selectedDoctor.doctorAddress,
-        reason,
-        {
-          value: selectedDoctor.fees.toString(),
-        }
+        reason
       );
       await tx.wait();
 
@@ -109,9 +106,9 @@ const BookAppointment = ({ contract, account }) => {
           {error}
         </Alert>
       ) : records.length === 0 ? (
-        <Alert severity="info" sx={{ mt: 2 }}>
+        <Typography variant="h6" align="center" mt={4}>
           No doctor records found.
-        </Alert>
+        </Typography>
       ) : (
         <Grid container spacing={3} mt={3} justifyContent="center">
           {records.map((record, index) => (
@@ -136,9 +133,6 @@ const BookAppointment = ({ contract, account }) => {
                   </Typography>
                   <Typography variant="body2">
                     <strong>Specialization:</strong> {record.specialization}
-                  </Typography>
-                  <Typography variant="body2">
-                    <strong>Fees:</strong> {record.fees.toString()} wei
                   </Typography>
                   <Typography variant="body2">
                     <strong>Time:</strong> {record.timeStamp.toString()}

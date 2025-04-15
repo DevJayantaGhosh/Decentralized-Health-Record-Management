@@ -23,8 +23,7 @@ contract HealthRecordManagement {
         address doctorAddress;
         string qualification;
         string specialization;
-        int256 fees;
-        bool status; // true = authorized
+        bool status;
         uint256 timeStamp;
         address addedBy;
     }
@@ -40,7 +39,6 @@ contract HealthRecordManagement {
         address indexed doctorAddress,
         string qualification,
         string specialization,
-        int256 fees,
         bool status,
         uint256 timeStamp,
         address indexed registeredBy
@@ -54,14 +52,19 @@ contract HealthRecordManagement {
         address indexed deRegisteredBy
     );
 
-    event TransferFeesAndBookAppointment(
+    event BookAppointmentAndGrantAccess(
         address indexed fromPatientAddress,
         address indexed toHealthServiceProviderAddress,
-        uint256 fees,
         string reason,
         uint256 timeStamp
     );
 
+    event MarkAppointmentDoneAndRevokeAccess(
+        address indexed fromPatientAddress,
+        address indexed toHealthServiceProviderAddress,
+        uint256 timeStamp
+    );
+    
     event AddHealthRecord(
         uint256 recordId,
         address indexed patientAddress,
@@ -74,6 +77,8 @@ contract HealthRecordManagement {
         uint256 timeStamp,
         address indexed addedBy
     );
+
+
 
     modifier onlyOwner() {
         require(msg.sender == owner, "Only contract owner can perform this action");
@@ -120,12 +125,10 @@ contract HealthRecordManagement {
     }
 
 
-
     function registerDoctor(
         address _doctorAddress,
         string memory _qualification,
-        string memory _specialization,
-        int256 _fees
+        string memory _specialization
     ) public onlyOwner {
         require(!doctorAuthorizationStatus[_doctorAddress], "Doctor already authorized");
 
@@ -133,7 +136,6 @@ contract HealthRecordManagement {
             doctorAddress: _doctorAddress,
             qualification: _qualification,
             specialization: _specialization,
-            fees: _fees,
             status: true,
             timeStamp: block.timestamp,
             addedBy: msg.sender
@@ -146,7 +148,6 @@ contract HealthRecordManagement {
             _doctorAddress,
             _qualification,
             _specialization,
-            _fees,
             true,
             block.timestamp,
             msg.sender
@@ -177,16 +178,7 @@ contract HealthRecordManagement {
         );
     }
 
-    function assignDoctorToPatient(address _doctorAddress) public {
-        require(doctorAuthorizationStatus[_doctorAddress], "Doctor is not authorized");
-
-        address _patientAddress = msg.sender;
-
-        patientToDoctors[_patientAddress].push(_doctorAddress);
-        doctorToPatients[_doctorAddress].push(_patientAddress);
-    }
-
-    function bookAppointment(address payable _doctorAddress, string memory _reason) public payable {
+    function bookAppointment(address _doctorAddress, string memory _reason) public payable {
         require(msg.sender != _doctorAddress, "Self-booking not allowed");
 
         Doctor memory doc;
@@ -202,30 +194,56 @@ contract HealthRecordManagement {
 
         require(found, "Doctor not found");
         require(doctorAuthorizationStatus[_doctorAddress], "Doctor is not authorized");
-        require(msg.value >= uint256(doc.fees), "Insufficient fees for appointment");
 
         // Check for existing booking
         address[] memory bookedDoctors = patientToDoctors[msg.sender];
         for (uint256 i = 0; i < bookedDoctors.length; i++) {
             require(bookedDoctors[i] != _doctorAddress, "Appointment with this doctor already booked");
         }
-
-        // Transfer fees
-        _doctorAddress.transfer(msg.value);
-
         // Add mappings
         patientToDoctors[msg.sender].push(_doctorAddress);
         doctorToPatients[_doctorAddress].push(msg.sender);
 
-        emit TransferFeesAndBookAppointment(
+        emit BookAppointmentAndGrantAccess(
             msg.sender,
             _doctorAddress,
-            msg.value,
             _reason,
             block.timestamp
         );
     }
 
+    function markAppointmentDoneAndRevokeAccess(address _doctorAddress) public {
+        address patient = msg.sender;
+        address[] storage doctorsList = patientToDoctors[patient];
+        bool found = false;
+
+        for (uint256 i = 0; i < doctorsList.length; i++) {
+            if (doctorsList[i] == _doctorAddress) {
+                doctorsList[i] = doctorsList[doctorsList.length - 1];
+                doctorsList.pop();
+                found = true;
+                break;
+            }
+        }
+
+        require(found, "Doctor not found in your appointment list");
+
+        // removing patient from doctor's mapping also
+        address[] storage patients = doctorToPatients[_doctorAddress];
+        for (uint256 j = 0; j < patients.length; j++) {
+            if (patients[j] == patient) {
+                patients[j] = patients[patients.length - 1];
+                patients.pop();
+                break;
+            }
+        }
+
+        emit MarkAppointmentDoneAndRevokeAccess(
+            msg.sender,
+            _doctorAddress,
+            block.timestamp
+        );
+    }
 
 
     function addHealthRecord(
@@ -277,7 +295,7 @@ contract HealthRecordManagement {
     }
 
 
-    function getAssignedDoctors(address _patientAddress) public view returns (address[] memory) {
+    function getAssignedDoctorsOfPatient(address _patientAddress) public view returns (address[] memory) {
         return patientToDoctors[_patientAddress];
     }
 
@@ -285,62 +303,6 @@ contract HealthRecordManagement {
         return doctorToPatients[_doctorAddress];
     }
 
-    function markAppointmentDoneByDoctor(address _patientAddress) public onlyAuthorizedHealthServiceProvider {
-        address doctor = msg.sender;
-        address[] storage patients = doctorToPatients[doctor];
-        bool found = false;
-
-        for (uint256 i = 0; i < patients.length; i++) {
-            if (patients[i] == _patientAddress) {
-                // Remove patient
-                patients[i] = patients[patients.length - 1];
-                patients.pop();
-                found = true;
-                break;
-            }
-        }
-
-        require(found, "Patient not found in your appointment list");
-
-        // Also remove doctor from patient's mapping
-        address[] storage docs = patientToDoctors[_patientAddress];
-        for (uint256 j = 0; j < docs.length; j++) {
-            if (docs[j] == doctor) {
-                docs[j] = docs[docs.length - 1];
-                docs.pop();
-                break;
-            }
-        }
-    }
-
-    function markAppointmentDoneByPatient(address _doctorAddress) public {
-        address patient = msg.sender;
-        address[] storage doctorsList = patientToDoctors[patient];
-        bool found = false;
-
-        for (uint256 i = 0; i < doctorsList.length; i++) {
-            if (doctorsList[i] == _doctorAddress) {
-                doctorsList[i] = doctorsList[doctorsList.length - 1];
-                doctorsList.pop();
-                found = true;
-                break;
-            }
-        }
-
-        require(found, "Doctor not found in your appointment list");
-
-        // Also remove patient from doctor's mapping
-        address[] storage patients = doctorToPatients[_doctorAddress];
-        for (uint256 j = 0; j < patients.length; j++) {
-            if (patients[j] == patient) {
-                patients[j] = patients[patients.length - 1];
-                patients.pop();
-                break;
-            }
-        }
-    }
-    
-    
    // Utility Functon
     function isDoctorOfPatient(address _doctor, address _patient) internal view returns (bool) {
         address[] memory doctorsOfPatient = patientToDoctors[_patient];

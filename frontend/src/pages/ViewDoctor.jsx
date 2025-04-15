@@ -18,7 +18,6 @@ import {
   TextField,
   Snackbar,
 } from "@mui/material";
-import { green, red } from "@mui/material/colors";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import CancelIcon from "@mui/icons-material/Cancel";
 
@@ -103,9 +102,9 @@ const ViewDoctor = ({ contract, account }) => {
           {error}
         </Alert>
       ) : records.length === 0 ? (
-        <Alert severity="info" sx={{ mt: 2 }}>
-          No doctor records found.
-        </Alert>
+        <Typography variant="h6" align="center" mt={4}>
+           No doctor records found.
+        </Typography>
       ) : (
         <Grid container spacing={3} mt={3} justifyContent="center">
           {records.map((record, index) => (
@@ -129,9 +128,6 @@ const ViewDoctor = ({ contract, account }) => {
                   </Typography>
                   <Typography variant="body2">
                     <strong>Specialization:</strong> {record.specialization}
-                  </Typography>
-                  <Typography variant="body2">
-                    <strong>Fees:</strong> {record.fees.toString()}
                   </Typography>
                   <Typography variant="body2">
                     <strong>Time:</strong> {record.timeStamp.toString()}

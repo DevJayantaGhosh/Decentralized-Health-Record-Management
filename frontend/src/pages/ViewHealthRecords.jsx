@@ -62,9 +62,9 @@ const ViewHealthRecords = ({ contract, account }) => {
           {error}
         </Alert>
       ) : records.length === 0 ? (
-        <Alert severity="info" sx={{ mt: 2 }}>
+        <Typography variant="h6" align="center" mt={4}>
           No health records found.
-        </Alert>
+        </Typography>
       ) : (
         <Stack spacing={2} alignItems="center">
           {records.map((record, index) => (

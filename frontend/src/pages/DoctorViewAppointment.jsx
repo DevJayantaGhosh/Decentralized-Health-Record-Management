@@ -1,5 +1,16 @@
 import React, { useState, useEffect } from "react";
-import { Container, Card, CardContent, Typography, Button, Box, Snackbar, Alert, CircularProgress } from "@mui/material";
+import {
+  Container,
+  Card,
+  CardContent,
+  Typography,
+  Button,
+  Grid,
+  Box,
+  Snackbar,
+  Alert,
+  CircularProgress,
+} from "@mui/material";
 import { useNavigate } from "react-router-dom";
 
 const delay = (ms) => new Promise((res) => setTimeout(res, ms));
@@ -27,112 +38,73 @@ const DoctorViewAppointment = ({ contract, account, role }) => {
     fetchPatients();
   }, [contract, account]);
 
-  const handleResolved = async (patientAddress) => {
-    try {
-      setLoading(true);
-      const tx = await contract.markAppointmentDoneByDoctor(patientAddress);
-      const txReceipt = await tx.wait();
-      const txHash = txReceipt.transactionHash;
-
-      await delay(3000);
-      const hashscanLink = `https://hashscan.io/testnet/transaction/${txHash}`;
-
-      setSnackbar({
-        open: true,
-        severity: "success",
-        message: (
-          <>
-            Appointment resolved ✅ |{" "}
-            <a
-              href={hashscanLink}
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{ color: "#fff", textDecoration: "underline" }}
-            >
-              View Txn
-            </a>
-          </>
-        ),
-      });
-
-      // Refresh the patient list
-      const updated = await contract.getPatientsOfDoctor(account);
-      setPatients(updated);
-    } catch (error) {
-      console.error(error);
-      setSnackbar({
-        open: true,
-        severity: "error",
-        message: "Failed to resolve appointment.",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-
- 
 
   return (
-    <Container>
-      <Typography variant="h4" gutterBottom>
+    <Container maxWidth="lg" sx={{ mt: 5 }}>
+      <Typography variant="h4" align="center" gutterBottom>
         Doctor's Appointments
       </Typography>
 
       {patients.length === 0 && (
-        <Typography variant="body1">No appointments assigned yet.</Typography>
+        <Typography variant="h6" align="center" mt={4}>
+          No appointments assigned yet.
+        </Typography>
       )}
+      <Grid container spacing={3} mt={3} justifyContent="center">
+        {patients.map((patientAddress, index) => (
+          <Grid item xs={12} sm={6} md={6} key={index}>
+            <Card>
+              <CardContent>
+                <Grid
+                  container
+                  justifyContent="space-between"
+                  alignItems="center"
+                >
+                  <Typography variant="h6">Patient</Typography>
+                </Grid>
 
-      {patients.map((patient, index) => (
-        <Card key={index} sx={{ mb: 2 }}>
-          <CardContent>
-            <Typography variant="h6">Patient Address: {patient}</Typography>
-            <Box sx={{ display: "flex", gap: 2, mt: 2 }}>
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={() =>
-                  navigate("/add", {
-                    state: {
-                      contract,
-                      account,
-                      role,
-                      selectedPatientAddress: patient,
-                    },
-                  })
-                }
-              >
-                Add New Record
-              </Button>
+                <Typography variant="body2" sx={{ mt: 1 }}>
+                  <strong>Address:</strong> {patientAddress}
+                </Typography>
 
-              <Button
-                variant="outlined"
-                color="secondary"
-                onClick={() =>
-                  navigate("/view-health-records", {
-                    state: {
-                      contract,
-                      account: patient,
-                      role,
-                    },
-                  })
-                }
-              >
-                View Previous Records
-              </Button>
-
-              <Button
-                variant="contained"
-                color="success"
-                onClick={() => handleResolved(patient)}
-                disabled={loading}
-              >
-                {loading ? <CircularProgress size={24} /> : "Resolved"}
-              </Button>
-            </Box>
-          </CardContent>
-        </Card>
-      ))}
+                <Box container spacing={3} mt={3} justifyContent="center">
+                  <Button
+                  sx={{ mt: 1 }}
+                    variant="contained"
+                    color="primary"
+                    onClick={() =>
+                      navigate("/view-health-records", {
+                        state: {
+                          contract,
+                          account: patientAddress,
+                          role,
+                        },
+                      })
+                    }
+                  >
+                    View Previous Records
+                  </Button>
+                  <Button
+                    variant="contained"
+                    color="success"
+                    sx={{ ml: 1 }}
+                    onClick={() =>
+                      navigate("/add-health-record", {
+                        state: {
+                          selectedPatientAddress: patientAddress,
+                        },
+                      })
+                      
+                    }
+                  >
+                    Add New Record
+                  </Button>
+                </Box>
+              </CardContent>
+            </Card>
+          </Grid>
+        ))}
+      </Grid>
 
       <Snackbar
         open={snackbar.open}
