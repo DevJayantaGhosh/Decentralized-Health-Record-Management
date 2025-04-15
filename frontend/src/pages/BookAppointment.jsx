@@ -18,7 +18,7 @@ import {
   TextField,
   Snackbar,
 } from "@mui/material";
-
+import Tooltip from "@mui/material/Tooltip";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import CancelIcon from "@mui/icons-material/Cancel";
 
@@ -30,7 +30,11 @@ const BookAppointment = ({ contract, account }) => {
   const [selectedDoctor, setSelectedDoctor] = useState(null);
   const [reason, setReason] = useState("");
   const [submitting, setSubmitting] = useState(false);
-  const [snackbar, setSnackbar] = useState({ open: false, message: "", severity: "success" });
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    severity: "success",
+  });
 
   const fetchRecords = async () => {
     try {
@@ -115,12 +119,22 @@ const BookAppointment = ({ contract, account }) => {
             <Grid item xs={12} sm={6} md={6} key={index}>
               <Card>
                 <CardContent>
-                  <Grid container justifyContent="space-between" alignItems="center">
+                  <Grid
+                    container
+                    justifyContent="space-between"
+                    alignItems="center"
+                  >
                     <Typography variant="h6">Doctor</Typography>
                     <Chip
                       label={record.status ? "Active" : "Inactive"}
                       color={record.status ? "success" : "error"}
-                      icon={record.status ? <CheckCircleOutlineIcon /> : <CancelIcon />}
+                      icon={
+                        record.status ? (
+                          <CheckCircleOutlineIcon />
+                        ) : (
+                          <CancelIcon />
+                        )
+                      }
                       sx={{ fontWeight: "bold" }}
                     />
                   </Grid>
@@ -149,16 +163,21 @@ const BookAppointment = ({ contract, account }) => {
                       {shortenAddress(record.addedBy)}
                     </Link>
                   </Typography>
-                  {record.status && record.doctorAddress.toLowerCase() !== account.toLowerCase() (// To avoid self booking
-                    <Button
-                      variant="contained"
-                      fullWidth
-                      sx={{ mt: 1 }}
-                      onClick={() => handleOpenDialog(record)}
-                    >
-                      Book Appointment
-                    </Button>
-                  )}
+
+
+                <Tooltip title={record.doctorAddress.toLowerCase() === account.toLowerCase() ? "Self booking is not allowed" : ""}>
+                  <span>
+                      <Button
+                        variant="contained"
+                        fullWidth
+                        sx={{ mt: 1 }}
+                        onClick={() => handleOpenDialog(record)}
+                        disabled={record.status === false || (typeof account === "string" && record.doctorAddress.toLowerCase() === account.toLowerCase()) }
+                      >
+                        Book Appointment
+                      </Button>
+                   </span>
+                </Tooltip>
                 </CardContent>
               </Card>
             </Grid>
@@ -167,7 +186,12 @@ const BookAppointment = ({ contract, account }) => {
       )}
 
       {/* Appointment Reason Dialog */}
-      <Dialog open={dialogOpen} onClose={handleDialogClose} maxWidth="sm" fullWidth>
+      <Dialog
+        open={dialogOpen}
+        onClose={handleDialogClose}
+        maxWidth="sm"
+        fullWidth
+      >
         <DialogTitle>Book Appointment</DialogTitle>
         <DialogContent>
           <TextField
