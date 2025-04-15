@@ -156,6 +156,16 @@ contract HealthRecordManagement {
     function deregisterDoctor(address _doctorAddress, string memory _reason) public onlyOwner {
         require(doctorAuthorizationStatus[_doctorAddress], "Doctor is not authorized");
 
+        bool found = false;
+        for (uint256 i = 0; i < doctors.length; i++) {
+            if (doctors[i].doctorAddress == _doctorAddress && doctors[i].status==true ) {
+                found = true;
+                doctors[i].status=false;
+                break;
+            }
+        }
+        require(found, "Doctor not found");
+
         doctorAuthorizationStatus[_doctorAddress] = false;
 
         emit DeRegisterAuthorizedDoctor(
@@ -274,6 +284,62 @@ contract HealthRecordManagement {
     function getPatientsOfDoctor(address _doctorAddress) public view returns (address[] memory) {
         return doctorToPatients[_doctorAddress];
     }
+
+    function markAppointmentDoneByDoctor(address _patientAddress) public onlyAuthorizedHealthServiceProvider {
+        address doctor = msg.sender;
+        address[] storage patients = doctorToPatients[doctor];
+        bool found = false;
+
+        for (uint256 i = 0; i < patients.length; i++) {
+            if (patients[i] == _patientAddress) {
+                // Remove patient
+                patients[i] = patients[patients.length - 1];
+                patients.pop();
+                found = true;
+                break;
+            }
+        }
+
+        require(found, "Patient not found in your appointment list");
+
+        // Also remove doctor from patient's mapping
+        address[] storage docs = patientToDoctors[_patientAddress];
+        for (uint256 j = 0; j < docs.length; j++) {
+            if (docs[j] == doctor) {
+                docs[j] = docs[docs.length - 1];
+                docs.pop();
+                break;
+            }
+        }
+    }
+
+    function markAppointmentDoneByPatient(address _doctorAddress) public {
+        address patient = msg.sender;
+        address[] storage doctorsList = patientToDoctors[patient];
+        bool found = false;
+
+        for (uint256 i = 0; i < doctorsList.length; i++) {
+            if (doctorsList[i] == _doctorAddress) {
+                doctorsList[i] = doctorsList[doctorsList.length - 1];
+                doctorsList.pop();
+                found = true;
+                break;
+            }
+        }
+
+        require(found, "Doctor not found in your appointment list");
+
+        // Also remove patient from doctor's mapping
+        address[] storage patients = doctorToPatients[_doctorAddress];
+        for (uint256 j = 0; j < patients.length; j++) {
+            if (patients[j] == patient) {
+                patients[j] = patients[patients.length - 1];
+                patients.pop();
+                break;
+            }
+        }
+    }
+    
     
    // Utility Functon
     function isDoctorOfPatient(address _doctor, address _patient) internal view returns (bool) {
