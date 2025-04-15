@@ -35,7 +35,7 @@ const AddHealthRecord = ({ contract, account, role, selectedPatientAddress }) =>
   useEffect(() => {
     if (isDoctor && selectedPatientAddress) {
       setFormData((prev) => ({ ...prev, patientAddress: selectedPatientAddress }));
-    } else if (!isDoctor) {
+    } else {
       setFormData((prev) => ({ ...prev, patientAddress: account }));
     }
   }, [isDoctor, selectedPatientAddress, account]);
