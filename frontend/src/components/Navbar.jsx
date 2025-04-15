@@ -14,26 +14,33 @@ const Navbar = ({ role, onProfileClick }) => {
   return (
     <AppBar position="fixed" sx={{ background: "rgba(0, 0, 0, 0.6)" }}>
       <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
-        <Typography variant="h6" sx={{ color: "white" }}>
-         MediChain
-        </Typography>
+        <Button variant="h6" sx={{ color: "white" }} component={Link} to="/">
+         Health Record Chain
+        </Button>
 
         {role && (
           <Box sx={{ display: "flex", gap: 2 }}>
-            <Button component={Link} to="/add" color="inherit">Add</Button>
-            <Button component={Link} to="/view" color="inherit">View</Button>
-            {role === "USER" && (
-              <Button component={Link} to="/book" color="inherit">Book-Appointments</Button>
-            )}
             {role === "OWNER" && (
-              <Button component={Link} to="/register-doctor" color="inherit">
-                Register-Doctor
-              </Button>
+              <>
+              <Button component={Link} to="/register-doctor" color="inherit"> Register-Doctor </Button>
+              <Button component={Link} to="/view-doctor" color="inherit"> View-Doctor</Button></>
+              
             )}
-            {(role === "HEALTH_SERVICE_PROVIDER") && (
-              <Button component={Link} to="/appointments" color="inherit">
-                Doctor-Appointments
-              </Button>
+            {(role === "USER") && (
+            <>
+            <Button component={Link} to="/add-health-record" color="inherit">Add</Button>
+            <Button component={Link} to="/view-health-records" color="inherit">View</Button>
+            <Button component={Link} to="/book-appointments" color="inherit">Book-Appointments</Button>
+            <Button component={Link} to="/patient-view-appointments" color="inherit">Patient-View-Appointments</Button>
+            </>
+            )}
+            {(role === "DOCTOR") && (
+              <>
+              <Button component={Link} to="/add-health-record" color="inherit">Add</Button>
+              <Button component={Link} to="/view-health-records" color="inherit">View</Button>
+              <Button component={Link} to="/book-appointments" color="inherit">Book-Appointments</Button>
+              <Button component={Link} to="/doctor-view-appointments" color="inherit">Doctor-View-Appointments</Button>
+              </>
             )}
           </Box>
         )}

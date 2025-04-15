@@ -14,15 +14,18 @@ import LandingPage from "./components/LandingPage";
 import ProfileOverlay from "./components/ProfileOverlay";
 
 import Dashboard from "./components/Dashboard";
-import AddRecord from "./pages/AddRecord";
-import ViewRecords from "./pages/ViewRecords";
+import AddHealthRecord from "./pages/AddHealthRecord";
+import ViewHealthRecords from "./pages/ViewHealthRecords";
 import BookAppointment from "./pages/BookAppointment";
-import RegisterProvider from "./pages/RegisterProvider";
-import Appointments from "./pages/Appointments";
+import RegisterDoctor from "./pages/RegisterDoctor";
+
 import { ContractAddress } from './config';
 import HealthRecordManagement from "./abis/HealthRecordManagement.json";
 import darkTheme from "./theme";
 import Layout from "./layout/Layout";
+import ViewDoctor from "./pages/ViewDoctor";
+import PatientViewAppointment from "./pages/PatientViewAppointment";
+import DoctorViewAppointment from "./pages/DoctorViewAppointment";
 
 const App = () => {
   const [state, setState] = useState({ provider: null, signer: null, contract: null });
@@ -89,13 +92,30 @@ const App = () => {
             />
             <Routes>
               <Route element={<Layout />}>
-                <Route path="/" element={<Dashboard />} />
-                <Route path="/add" element={<AddRecord contract={state.contract} />} />
-                <Route path="/view" element={<ViewRecords contract={state.contract} />} />
-                {role === "USER" && <Route path="/book" element={<BookAppointment contract={state.contract} />} />}
-                {role === "OWNER" && <Route path="/register-doctor" element={<RegisterProvider contract={state.contract} />} />}
-                {(role === "USER" || role === "HEALTH_SERVICE_PROVIDER") && (
-                  <Route path="/appointments" element={<Appointments contract={state.contract} />} />
+                <Route path="/" element={<Dashboard role={role} />} />
+                {(role === "OWNER") && (
+                  <>
+                  <Route path="/register-doctor" element={<RegisterDoctor contract={state.contract} account={account} role={role} />} />
+                  <Route path="/view-doctor" element={<ViewDoctor contract={state.contract} account={account} role={role} />} />
+                  </>
+                )}
+
+                {(role === "USER") && (
+                  <>
+                  <Route path="/add-health-record" element={<AddHealthRecord contract={state.contract} account={account} role={role} selectedPatientAddress={null} />} />
+                  <Route path="/view-health-records" element={<ViewHealthRecords contract={state.contract} account={account} role={role} />} />
+                  <Route path="/book-appointments" element={<BookAppointment contract={state.contract} account={account} role={role} />} />
+                  <Route path="/patient-view-appointments" element={<PatientViewAppointment contract={state.contract} account={account} role={role} />} />
+                  </>
+                )}
+
+                {(role === "DOCTOR") && (
+                  <>
+                  <Route path="/add-health-record" element={<AddHealthRecord contract={state.contract} account={account} role={role} selectedPatientAddress={null} />} />
+                  <Route path="/view-health-records" element={<ViewHealthRecords contract={state.contract} account={account} role={role} />} />
+                  <Route path="/book-appointments" element={<BookAppointment contract={state.contract} account={account} role={role} />} />
+                  <Route path="/doctor-view-appointments" element={<DoctorViewAppointment contract={state.contract} account={account} role={role} />} />
+                  </>
                 )}
               </Route>
             </Routes>

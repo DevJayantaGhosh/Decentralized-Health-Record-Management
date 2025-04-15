@@ -19,7 +19,7 @@ const LandingPage = ({ connectWallet }) => (
     }}
   >
     <Typography variant="h3" gutterBottom>
-      Welcome to MediChain
+      Welcome to Health Record Chain
     </Typography>
     <Typography variant="h4" gutterBottom>
       Decentralized Health Records Management System

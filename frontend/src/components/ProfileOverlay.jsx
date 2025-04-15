@@ -7,12 +7,21 @@ import {
   IconButton,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 
 const ProfileOverlay = ({ open, onClose, address, role }) => {
   return (
     <Dialog open={open} onClose={onClose}>
       <DialogTitle>
+      <IconButton
+          sx={{
+            alignItems: "center"
+          }}>
+        <AccountCircleIcon />
+        </IconButton>
+        
         Profile
+
         <IconButton
           aria-label="close"
           onClick={onClose}
