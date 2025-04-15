@@ -1,17 +1,10 @@
 # Solidity Backend with Hardhat
 
-Solidity-based backend setup using Hardhat for smart contract development. It supports compilation, testing, and deployment of smart contracts to Hedera's Testnet, Previewnet, and Mainnet.
+Solidity-based backend setup using Hardhat for smart contract development
 
 ---
 
-## Prerequisites
 
-Before you begin, ensure you have the following installed:
-- [Node.js](https://nodejs.org/en/)
-- [npm](https://www.npmjs.com/) or [yarn](https://yarnpkg.com/)
-- [Hardhat](https://hardhat.org/)
-
----
 
 ## Environment Configuration
 
@@ -22,28 +15,19 @@ Before you begin, ensure you have the following installed:
 # For Hedera Testnet
 TESTNET_OPERATOR_PRIVATE_KEY=
 TESTNET_ENDPOINT='https://testnet.hashio.io/api'
-
-# For Hedera Previewnet
-PREVIEWNET_OPERATOR_PRIVATE_KEY="PREVIEWNET_OPERATOR_PRIVATE_KEY"
-PREVIEWNET_ENDPOINT='PREVIEWNET_ENDPOINT_URL'
-
-# For Hedera Mainnet
-MAINNET_OPERATOR_PRIVATE_KEY="MAINNET_OPERATOR_PRIVATE_KEY"
-MAINNET_ENDPOINT='MAINNET_ENDPOINT_URL'
----
+```
 
 
-## Run the following command to build and test the smart contract.
 
+
+## Run the following command to deploy the smart contract. 
 ```shell
+# Run the following command to build and test the smart contract.
 npx hardhat help
 npx hardhat clean
 npx hardhat compile
 npx hardhat test --network testnet
-```
 
-## Run the following command to deploy the smart contract. 
-```shell
 # deploys to the default network
 npx hardhat deploy-contract
 
