@@ -149,8 +149,7 @@ const BookAppointment = ({ contract, account }) => {
                       {shortenAddress(record.addedBy)}
                     </Link>
                   </Typography>
-//record.doctorAddress.toLowerCase() !== account.toLowerCase()
-                  {record.status && (
+                  {record.status && record.doctorAddress.toLowerCase() !== account.toLowerCase() (// To avoid self booking
                     <Button
                       variant="contained"
                       fullWidth
