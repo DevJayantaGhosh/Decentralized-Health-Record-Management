@@ -8,16 +8,13 @@ import {
   Grid,
   Box,
   Snackbar,
-  Alert,
-  CircularProgress,
+  Alert
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 
-const delay = (ms) => new Promise((res) => setTimeout(res, ms));
-
 const DoctorViewAppointment = ({ contract, account, role }) => {
   const [patients, setPatients] = useState([]);
-  const [loading, setLoading] = useState(false);
+
   const [snackbar, setSnackbar] = useState({
     open: false,
     severity: "success",
