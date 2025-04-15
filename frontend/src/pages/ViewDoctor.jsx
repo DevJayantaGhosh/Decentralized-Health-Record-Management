@@ -107,9 +107,9 @@ const ViewDoctor = ({ contract, account }) => {
           No doctor records found.
         </Alert>
       ) : (
-        <Grid container spacing={3} mt={3}>
+        <Grid container spacing={3} mt={3} justifyContent="center">
           {records.map((record, index) => (
-            <Grid item xs={12} sm={6} md={4} key={index}>
+            <Grid item xs={12} sm={6} md={6} key={index}>
               <Card sx={{ backgroundColor: "#1e1e1e", borderRadius: 2, boxShadow: 3 }}>
                 <CardContent>
                   <Grid container justifyContent="space-between" alignItems="center">

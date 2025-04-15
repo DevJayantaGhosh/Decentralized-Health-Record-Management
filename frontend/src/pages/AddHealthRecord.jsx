@@ -232,7 +232,7 @@ const AddHealthRecord = ({ contract, account, role, selectedPatientAddress }) =>
             color="primary"
             type="submit"
             fullWidth
-            sx={{ mt: 2 }}
+            sx={{ mt: 2, mb: 4 }}
             disabled={loading}
           >
             {loading ? <CircularProgress size={24} color="inherit" /> : "Submit Record"}
