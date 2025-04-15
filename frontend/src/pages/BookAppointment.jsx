@@ -164,20 +164,31 @@ const BookAppointment = ({ contract, account }) => {
                     </Link>
                   </Typography>
 
-
-                <Tooltip title={record.doctorAddress.toLowerCase() === account.toLowerCase() ? "Self booking is not allowed" : ""}>
-                  <span>
+                  <Tooltip
+                    title={
+                      record.doctorAddress.toLowerCase() ===
+                      account.toLowerCase()
+                        ? "Self booking is not allowed"
+                        : ""
+                    }
+                  >
+                    <span>
                       <Button
                         variant="contained"
                         fullWidth
                         sx={{ mt: 1 }}
                         onClick={() => handleOpenDialog(record)}
-                        disabled={record.status === false || (typeof account === "string" && record.doctorAddress.toLowerCase() === account.toLowerCase()) }
+                        disabled={
+                          record.status === false ||
+                          (typeof account === "string" &&
+                            record.doctorAddress.toLowerCase() ===
+                              account.toLowerCase())
+                        }
                       >
                         Book Appointment
                       </Button>
-                   </span>
-                </Tooltip>
+                    </span>
+                  </Tooltip>
                 </CardContent>
               </Card>
             </Grid>
