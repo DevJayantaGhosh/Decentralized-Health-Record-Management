@@ -8,7 +8,7 @@ import {
   Grid,
   Box,
   Snackbar,
-  Alert
+  Alert,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 
@@ -34,7 +34,6 @@ const DoctorViewAppointment = ({ contract, account, role }) => {
     };
     fetchPatients();
   }, [contract, account]);
-
 
   return (
     <Container maxWidth="lg" sx={{ mt: 5 }}>
@@ -66,15 +65,13 @@ const DoctorViewAppointment = ({ contract, account, role }) => {
 
                 <Box container spacing={3} mt={3} justifyContent="center">
                   <Button
-                  sx={{ mt: 1 }}
+                    sx={{ mt: 1 }}
                     variant="contained"
                     color="primary"
                     onClick={() =>
                       navigate("/view-health-records", {
                         state: {
-                          contract,
-                          account: patientAddress,
-                          role,
+                          selectedPatientAddress: patientAddress,
                         },
                       })
                     }
@@ -91,7 +88,6 @@ const DoctorViewAppointment = ({ contract, account, role }) => {
                           selectedPatientAddress: patientAddress,
                         },
                       })
-                      
                     }
                   >
                     Add New Record

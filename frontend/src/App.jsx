@@ -102,7 +102,7 @@ const App = () => {
 
                 {(role === "USER") && (
                   <>
-                  <Route path="/add-health-record" element={<AddHealthRecord contract={state.contract} account={account} role={role} selectedPatientAddress={null} />} />
+                  <Route path="/add-health-record" element={<AddHealthRecord contract={state.contract} account={account} role={role}  />} />
                   <Route path="/view-health-records" element={<ViewHealthRecords contract={state.contract} account={account} role={role} />} />
                   <Route path="/book-appointments" element={<BookAppointment contract={state.contract} account={account} role={role} />} />
                   <Route path="/patient-view-appointments" element={<PatientViewAppointment contract={state.contract} account={account} role={role} />} />
@@ -111,7 +111,7 @@ const App = () => {
 
                 {(role === "DOCTOR") && (
                   <>
-                  <Route path="/add-health-record" element={<AddHealthRecord contract={state.contract} account={account} role={role} selectedPatientAddress={null} />} />
+                  <Route path="/add-health-record" element={<AddHealthRecord contract={state.contract} account={account} role={role} />} />
                   <Route path="/view-health-records" element={<ViewHealthRecords contract={state.contract} account={account} role={role} />} />
                   <Route path="/book-appointments" element={<BookAppointment contract={state.contract} account={account} role={role} />} />
                   <Route path="/doctor-view-appointments" element={<DoctorViewAppointment contract={state.contract} account={account} role={role} />} />

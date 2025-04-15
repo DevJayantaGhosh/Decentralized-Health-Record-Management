@@ -12,8 +12,9 @@ import {
   Stack,
 } from "@mui/material";
 import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
-
+import { useLocation } from "react-router-dom";
 const ViewHealthRecords = ({ contract, account }) => {
+  const location = useLocation()
   const [records, setRecords] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -24,10 +25,12 @@ const ViewHealthRecords = ({ contract, account }) => {
         setLoading(true);
         setError("");
 
+        const selectedPatientAddress = location.state?.selectedPatientAddress || account;
+
         const userAddress =
-          typeof account === "object" && account.address
-            ? account.address
-            : account?.toString();
+          typeof selectedPatientAddress === "object" && selectedPatientAddress.address
+            ? selectedPatientAddress.address
+            : selectedPatientAddress?.toString();
 
         if (!userAddress) throw new Error("User address not available.");
 

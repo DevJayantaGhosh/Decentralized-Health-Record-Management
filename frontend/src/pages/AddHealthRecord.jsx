@@ -12,12 +12,12 @@ import {
   Link,
 } from "@mui/material";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-
+import { useLocation } from "react-router-dom";
 const delay = (ms) => new Promise((res) => setTimeout(res, ms));
-
-const AddHealthRecord = ({ contract, account, role, selectedPatientAddress }) => {
+const AddHealthRecord = ({ contract, account, role }) => {
   const isDoctor = role === "DOCTOR";
-
+  const location = useLocation();
+  const selectedPatientAddress = location.state?.selectedPatientAddress || account;
   const [formData, setFormData] = useState({
     patientAddress: "",
     height: "",
