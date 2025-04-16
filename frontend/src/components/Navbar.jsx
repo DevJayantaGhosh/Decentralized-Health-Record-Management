@@ -16,6 +16,7 @@ const Navbar = ({ role, onProfileClick }) => {
         <Button variant="h2" sx={{ color: "white" , fontWeight: "bold" }} component={Link} to="/">
          Health Record Chain
         </Button>
+        <Box sx={{ display: "flex", alignItems: "center", justifyContent: "flex-end", flexGrow: 1, gap: 2 }}>
 
         {role && (
           <Box sx={{ display: "flex", gap: 2 }}>
@@ -49,6 +50,7 @@ const Navbar = ({ role, onProfileClick }) => {
             <AccountCircleIcon />
           </IconButton>
         )}
+        </Box>
       </Toolbar>
     </AppBar>
   );
