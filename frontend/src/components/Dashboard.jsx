@@ -26,19 +26,20 @@ const Dashboard = ({ role }) => {
       { label: "Add Health Record", path: "/add-health-record" },
       { label: "View Health Records", path: "/view-health-records" },
       { label: "Book Appointments", path: "/book-appointments" },
-      { label: "View Appointments", path: "/patient-view-appointments" },
+      { label: "Appointments By You", path: "/patient-view-appointments" },
     ],
     DOCTOR: [
       { label: "Add Health Record", path: "/add-health-record" },
       { label: "View Health Records", path: "/view-health-records" },
       { label: "Book Appointments", path: "/book-appointments" },
-      { label: "View Appointments", path: "/doctor-view-appointments" },
+      { label: "Appointments By You", path: "/patient-view-appointments" },
+      { label: "Appointments With You", path: "/doctor-view-appointments" },
     ],
   };
 
   return (
     <Container maxWidth="lg" sx={{ mt: 5 }}>
-      <Typography variant="h6" align="center" gutterBottom>
+      <Typography variant="h5" align="center" gutterBottom>
         Welcome to Health Record Chain
       </Typography>
 

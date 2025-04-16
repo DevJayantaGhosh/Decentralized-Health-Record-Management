@@ -31,7 +31,7 @@ const Navbar = ({ role, onProfileClick }) => {
             <Button component={Link} to="/add-health-record" color="inherit">Add</Button>
             <Button component={Link} to="/view-health-records" color="inherit">View</Button>
             <Button component={Link} to="/book-appointments" color="inherit">Book-Appointments</Button>
-            <Button component={Link} to="/patient-view-appointments" color="inherit">Patient-View-Appointments</Button>
+            <Button component={Link} to="/patient-view-appointments" color="inherit">Appointments-By-You</Button>
             </>
             )}
             {(role === "DOCTOR") && (
@@ -39,7 +39,8 @@ const Navbar = ({ role, onProfileClick }) => {
               <Button component={Link} to="/add-health-record" color="inherit">Add</Button>
               <Button component={Link} to="/view-health-records" color="inherit">View</Button>
               <Button component={Link} to="/book-appointments" color="inherit">Book-Appointments</Button>
-              <Button component={Link} to="/doctor-view-appointments" color="inherit">Doctor-View-Appointments</Button>
+              <Button component={Link} to="/patient-view-appointments" color="inherit">Appointments-By-You</Button>
+              <Button component={Link} to="/doctor-view-appointments" color="inherit">Appointments-With-You</Button>
               </>
             )}
           </Box>

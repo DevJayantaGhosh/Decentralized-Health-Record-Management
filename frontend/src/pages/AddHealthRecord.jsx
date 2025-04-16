@@ -123,7 +123,7 @@ const AddHealthRecord = ({ contract, account, role }) => {
 
   return (
     <Container maxWidth="sm" sx={{ mt: 5 }}>
-      <Typography variant="h6" align="center" gutterBottom>
+      <Typography variant="h5" align="center" gutterBottom>
         Add Health Record
       </Typography>
 
