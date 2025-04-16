@@ -130,7 +130,7 @@ const ViewDoctor = ({ contract, account }) => {
                     <strong>Specialization:</strong> {record.specialization}
                   </Typography>
                   <Typography variant="body2">
-                    <strong>Time:</strong> {record.timeStamp.toString()}
+                    <strong>Time:</strong> {new Date(record.timeStamp * 1000).toLocaleString()}
                   </Typography>
                   <Typography variant="body2" sx={{ mb: 1 }}>
                     <strong>Added By:</strong>{" "}

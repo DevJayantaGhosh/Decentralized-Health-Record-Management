@@ -108,6 +108,9 @@ const ViewHealthRecords = ({ contract, account }) => {
                     <strong>Treatment:</strong> {record.treatment}
                   </Typography>
                   <Typography variant="body2">
+                    <strong>Time:</strong> {new Date(record.timeStamp * 1000).toLocaleString()}
+                  </Typography>
+                  <Typography variant="body2">
                     <strong>Added By:</strong>{" "}
                     <Link
                       href={`https://hashscan.io/testnet/account/${record.addedBy}`}
