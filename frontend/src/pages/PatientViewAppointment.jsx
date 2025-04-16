@@ -77,7 +77,7 @@ const PatientViewAppointment = ({ contract, account }) => {
 
   return (
     <Container maxWidth="lg" sx={{ mt: 5 }}>
-      <Typography variant="h4" align="center" gutterBottom>
+      <Typography variant="h6" align="center" gutterBottom>
         Your Booked Appointments
       </Typography>
 

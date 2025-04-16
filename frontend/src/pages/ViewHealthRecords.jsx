@@ -54,7 +54,7 @@ const ViewHealthRecords = ({ contract, account }) => {
 
   return (
     <Container maxWidth="sm" sx={{ mt: 5 }}>
-      <Typography variant="h4" align="center" gutterBottom>
+      <Typography variant="h6" align="center" gutterBottom>
         Your Health Records
       </Typography>
 

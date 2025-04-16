@@ -38,8 +38,8 @@ const Dashboard = ({ role }) => {
 
   return (
     <Container maxWidth="lg" sx={{ mt: 5 }}>
-      <Typography variant="h4" align="center" gutterBottom>
-        Welcome to the Dashboard
+      <Typography variant="h6" align="center" gutterBottom>
+        Welcome to Health Record Chain
       </Typography>
 
       <Box
@@ -69,9 +69,7 @@ const Dashboard = ({ role }) => {
                 }}
               >
                 <Typography
-                  variant="h6"
                   align="center"
-                  sx={{ fontWeight: "bold" }}
                 >
                   {action.label}
                 </Typography>

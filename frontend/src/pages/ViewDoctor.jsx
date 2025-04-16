@@ -91,7 +91,7 @@ const ViewDoctor = ({ contract, account }) => {
 
   return (
     <Container maxWidth="lg" sx={{ mt: 5 }}>
-      <Typography variant="h4" align="center" gutterBottom>
+      <Typography variant="h6" align="center" gutterBottom>
         Doctors
       </Typography>
 

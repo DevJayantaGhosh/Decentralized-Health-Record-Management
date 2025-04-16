@@ -101,14 +101,14 @@ const RegisterDoctor = ({ contract, account, role }) => {
 
   return (
     <Container maxWidth="sm" sx={{ mt: 5 }}>
-      <Typography variant="h4" align="center" gutterBottom>
+      <Typography variant="h6" align="center" gutterBottom>
         Register Doctor
       </Typography>
 
       {successDetails ? (
         <Paper elevation={4} sx={{ p: 4, textAlign: "center", mt: 3 }}>
           <CheckCircleIcon color="success" sx={{ fontSize: 60 }} />
-          <Typography variant="h5" mt={2} gutterBottom>
+          <Typography variant="h6" mt={2} gutterBottom>
             {successDetails.message}
           </Typography>
           <Typography variant="body1" gutterBottom>

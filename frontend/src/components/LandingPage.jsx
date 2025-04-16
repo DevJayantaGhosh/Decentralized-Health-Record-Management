@@ -21,7 +21,7 @@ const LandingPage = ({ connectWallet }) => (
     <Typography variant="h3" gutterBottom>
       Welcome to Health Record Chain
     </Typography>
-    <Typography variant="h4" gutterBottom>
+    <Typography variant="h6" gutterBottom>
       Decentralized Health Records Management System
     </Typography>
     <Button

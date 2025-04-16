@@ -13,7 +13,7 @@ const Navbar = ({ role, onProfileClick }) => {
   return (
     <AppBar position="fixed" sx={{ background: "rgba(0, 0, 0, 0.6)" }}>
       <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
-        <Button variant="h6" sx={{ color: "white" }} component={Link} to="/">
+        <Button variant="h2" sx={{ color: "white" , fontWeight: "bold" }} component={Link} to="/">
          Health Record Chain
         </Button>
 
