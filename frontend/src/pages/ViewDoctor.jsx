@@ -152,7 +152,7 @@ const ViewDoctor = ({ contract, account }) => {
                       fullWidth
                       onClick={() => handleDeactivateClick(record)}
                     >
-                      Inactivate
+                      Deactivate
                     </Button>
                   )}
                 </CardContent>
@@ -164,7 +164,7 @@ const ViewDoctor = ({ contract, account }) => {
 
       {/* Deactivation Reason Dialog */}
       <Dialog open={dialogOpen} onClose={handleDialogClose} maxWidth="sm" fullWidth>
-        <DialogTitle>Inactivate Doctor</DialogTitle>
+        <DialogTitle>Deactivate Doctor</DialogTitle>
         <DialogContent>
           <TextField
             label="Reason for inactivation"
